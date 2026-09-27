@@ -40,3 +40,71 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/*
+ * Logo draw-on. Each path carries `--logo-i` in [0, 1] (its left-to-right
+ * position) and `pathLength="1"`, so a single dasharray works for every glyph
+ * regardless of its real length. Keep --logo-draw-total in sync with
+ * LOGO_DRAW_SECONDS in components/logo-draw.tsx.
+ */
+:root {
+  --logo-stroke-seconds: 0.8s;
+  --logo-stagger-seconds: 1.2s;
+  --logo-draw-total: 2s;
+}
+
+.logo-draw-path {
+  stroke: currentColor;
+  stroke-width: 10;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  fill: currentColor;
+  fill-opacity: 0;
+  animation:
+    logo-draw-stroke var(--logo-stroke-seconds)
+      calc(var(--logo-stagger-seconds) * var(--logo-i))
+      cubic-bezier(0.65, 0, 0.35, 1) forwards,
+    logo-draw-fill 0.6s calc(var(--logo-draw-total) - 0.4s) ease-out forwards,
+    logo-draw-unstroke 0.4s var(--logo-draw-total) ease-in forwards;
+}
+
+@keyframes logo-draw-stroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes logo-draw-fill {
+  to {
+    fill-opacity: 1;
+  }
+}
+
+@keyframes logo-draw-unstroke {
+  to {
+    stroke-opacity: 0;
+  }
+}
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--background);
+  color: var(--foreground);
+  transition: opacity 0.4s ease-out;
+}
+
+.preloader[data-leaving] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-draw-path {
+    stroke: none;
+    animation: logo-draw-fill 0.4s ease-out forwards;
+  }
+}
